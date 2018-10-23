@@ -1,0 +1,45 @@
+apiVersion: apps/v1beta2
+kind: Deployment
+metadata:
+  name: back-test
+  labels:
+    app: back
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: back
+  template:
+    metadata:
+      labels:
+        app: back
+    spec:
+      containers:
+      - name: back-app
+        image: gcr.io/airy-torus-219905/testservice
+        imagePullPolicy: Always
+        ports:
+        - name: back-server
+          containerPort: 3000
+        resources:
+          limits:
+            cpu: "200m"
+            memory: "290Mi"
+          requests:
+            cpu: "80m"
+            memory: "90Mi"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: back-proxy
+spec:
+  selector:
+    app: back
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: back-server
+  type: LoadBalancer
